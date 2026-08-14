@@ -120,3 +120,4 @@ pm2 startup
 - The Admin dashboard issues a 12-hour stateless JWT stored in `localStorage`. 
 - No secure APIs can be hit without providing a valid `Bearer Token`.
 - See `USER_MANUAL.md` for instructions on how to immediately change the default admin password.
+# Injury_tracker
