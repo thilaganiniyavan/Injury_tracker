@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="color: var(--text-secondary);">${formattedDate}</td>
-                        <td style="font-weight: 600;">Station ${log.station_code}</td>
+                        <td style="font-weight: 600;">${log.station_code}</td>
                         <td>${formatDate(log.previous_last_injury_date)}</td>
                         <td style="color: var(--accent-color); font-weight: 600;">${formatDate(log.new_last_injury_date)}</td>
                     `;
@@ -111,7 +111,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="font-weight: 600;">Station ${station.station_code}</td>
+                <td style="font-weight: 600;">${station.station_code}</td>
+                <td>${formatDate(station.campaign_start_date)}</td>
                 <td>${formatDate(station.last_injury_date)}</td>
                 <td><span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-color);">${days}</span></td>
                 <td>

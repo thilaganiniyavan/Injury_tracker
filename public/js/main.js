@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'glass-card station-card';
             
             card.innerHTML = `
-                <div class="station-code">Station ${station.station_code}</div>
+                <div class="station-code">${station.station_code}</div>
                 <div class="injury-days">${days}</div>
                 <div class="days-label">Injury-Free Days</div>
             `;

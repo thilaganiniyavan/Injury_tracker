@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nameEl = document.getElementById('station-name');
     const daysEl = document.getElementById('injury-days');
+    const campaignDateEl = document.getElementById('campaign-start-date');
     const dateEl = document.getElementById('last-injury-date');
 
     async function fetchStation() {
@@ -35,8 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderStation(station) {
         const days = calculateInjuryFreeDays(station.last_injury_date);
         
-        nameEl.textContent = `Station ${station.station_code}`;
+        nameEl.textContent = station.station_code;
         daysEl.textContent = days;
+        campaignDateEl.textContent = formatDate(station.campaign_start_date);
         dateEl.textContent = formatDate(station.last_injury_date);
 
         loading.classList.add('hidden');

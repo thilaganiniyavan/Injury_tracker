@@ -21,10 +21,13 @@
         <main id="station-content" class="station-page-container">
             <div id="loading" class="loading">Loading station data...</div>
             <div id="station-details" class="hidden">
-                <div id="station-name" class="station-page-code">Station --</div>
+                <div id="station-name" class="station-page-code">--</div>
                 <div id="injury-days" class="station-page-days">--</div>
                 <div class="station-page-label">Injury-Free Days</div>
-                <div class="station-page-date">Last Injury Date: <span id="last-injury-date">--</span></div>
+                <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+                    <div class="station-page-date">Campaign Started: <span id="campaign-start-date" style="color: var(--text-primary); font-weight: 700;">--</span></div>
+                    <div class="station-page-date">Last Injury Date: <span id="last-injury-date" style="color: var(--text-primary); font-weight: 700;">--</span></div>
+                </div>
             </div>
             <div id="error-message" class="hidden error-message" style="font-size: 1.5rem;"></div>
         </main>

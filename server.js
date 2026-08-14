@@ -35,7 +35,7 @@ const authenticateAdmin = (req, res, next) => {
 
 // Get all stations
 app.get('/api/stations', (req, res) => {
-    db.all(`SELECT id, station_code, last_injury_date FROM stations ORDER BY station_code`, [], (err, rows) => {
+    db.all(`SELECT id, station_code, campaign_start_date, last_injury_date FROM stations ORDER BY id`, [], (err, rows) => {
         if (err) return res.status(500).json({ error: 'Database error' });
         res.json(rows);
     });
@@ -43,7 +43,7 @@ app.get('/api/stations', (req, res) => {
 
 // Get single station
 app.get('/api/stations/:code', (req, res) => {
-    db.get(`SELECT id, station_code, last_injury_date FROM stations WHERE station_code = ?`, [req.params.code], (err, row) => {
+    db.get(`SELECT id, station_code, campaign_start_date, last_injury_date FROM stations WHERE station_code = ?`, [req.params.code], (err, row) => {
         if (err) return res.status(500).json({ error: 'Database error' });
         if (!row) return res.status(404).json({ error: 'Station not found' });
         res.json(row);
