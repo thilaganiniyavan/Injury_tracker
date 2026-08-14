@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Dashboard | Injury-Free Days</title>
+    <meta name="description" content="Company Safety Dashboard tracking injury-free days across all stations.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Safety Dashboard</h1>
+                <p class="subtitle">Live Tracking of Injury-Free Days across all stations</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button id="theme-toggle" class="btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding: 0;">
+                    🌙
+                </button>
+                <div class="logo-placeholder">COMPANY LOGO</div>
+            </div>
+        </header>
+
+        <main>
+            <div id="loading" class="loading">Loading station data...</div>
+            <div id="stations-grid" class="stations-grid hidden">
+                <!-- Station cards will be injected here via JS -->
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

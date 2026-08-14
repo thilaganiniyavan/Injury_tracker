@@ -1,0 +1,238 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check if token exists, if not redirect
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        window.location.href = '/admin-login';
+        return;
+    }
+
+    const table = document.getElementById('admin-stations-table');
+    const tbody = document.getElementById('admin-table-body');
+    const loading = document.getElementById('loading');
+
+    // Modals
+    const resetModal = document.getElementById('reset-modal');
+    const confirmResetBtn = document.getElementById('confirm-reset-btn');
+    const cancelResetBtn = document.getElementById('cancel-reset-btn');
+    const resetModalText = document.getElementById('reset-modal-text');
+
+    const pwdModal = document.getElementById('pwd-modal');
+    const changePwdBtn = document.getElementById('change-pwd-btn');
+    const cancelPwdBtn = document.getElementById('cancel-pwd-btn');
+    const pwdForm = document.getElementById('pwd-form');
+
+    let currentResetStationId = null;
+    let stationsData = [];
+
+    // Verify session
+    try {
+        const res = await fetchWithAuth('/api/admin/me');
+        if (!res) return; // Handled by fetchWithAuth
+    } catch (e) {
+        return;
+    }
+
+    // Load logs
+    async function loadLogs() {
+        const logsTable = document.getElementById('admin-logs-table');
+        const logsBody = document.getElementById('logs-table-body');
+        const logsLoading = document.getElementById('logs-loading');
+        const noLogsMsg = document.getElementById('no-logs-msg');
+        
+        logsLoading.classList.remove('hidden');
+        logsTable.classList.add('hidden');
+        noLogsMsg.classList.add('hidden');
+
+        try {
+            const res = await fetchWithAuth('/api/admin/logs');
+            if (!res) return;
+            
+            const logs = await res.json();
+            
+            if (logs.length === 0) {
+                noLogsMsg.classList.remove('hidden');
+            } else {
+                logsBody.innerHTML = '';
+                logs.forEach(log => {
+                    // Format timestamp
+                    const dateObj = new Date(log.reset_timestamp + 'Z'); // SQLite CURRENT_TIMESTAMP is UTC
+                    const formattedDate = dateObj.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata' });
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="color: var(--text-secondary);">${formattedDate}</td>
+                        <td style="font-weight: 600;">Station ${log.station_code}</td>
+                        <td>${formatDate(log.previous_last_injury_date)}</td>
+                        <td style="color: var(--accent-color); font-weight: 600;">${formatDate(log.new_last_injury_date)}</td>
+                    `;
+                    logsBody.appendChild(tr);
+                });
+                logsTable.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.error('Error loading logs', e);
+            noLogsMsg.textContent = 'Error loading logs.';
+            noLogsMsg.classList.remove('hidden');
+        } finally {
+            logsLoading.classList.add('hidden');
+        }
+    }
+
+    // Load stations
+    async function loadStations() {
+        try {
+            const res = await fetchWithAuth('/api/stations');
+            if (!res) return;
+            
+            stationsData = await res.json();
+            renderTable();
+        } catch (e) {
+            console.error('Error loading stations', e);
+            loading.innerHTML = '<div class="error-message">Failed to load data.</div>';
+        }
+    }
+
+    // Get current IST date formatted
+    function getTodayISTFormatted() {
+        const formatter = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Kolkata',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        return formatter.format(new Date());
+    }
+
+    function renderTable() {
+        tbody.innerHTML = '';
+        
+        stationsData.forEach(station => {
+            const days = calculateInjuryFreeDays(station.last_injury_date);
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight: 600;">Station ${station.station_code}</td>
+                <td>${formatDate(station.last_injury_date)}</td>
+                <td><span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-color);">${days}</span></td>
+                <td>
+                    <button class="btn btn-danger reset-btn" data-id="${station.id}" data-code="${station.station_code}">
+                        Reset to Today
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Add event listeners to reset buttons
+        document.querySelectorAll('.reset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                const code = e.target.getAttribute('data-code');
+                openResetModal(id, code);
+            });
+        });
+
+        loading.classList.add('hidden');
+        table.classList.remove('hidden');
+    }
+
+    // Reset Modal Logic
+    function openResetModal(id, code) {
+        currentResetStationId = id;
+        const todayStr = getTodayISTFormatted();
+        resetModalText.textContent = `Reset Station ${code}'s last injury date to today (${todayStr})?`;
+        resetModal.classList.add('active');
+    }
+
+    function closeResetModal() {
+        resetModal.classList.remove('active');
+        currentResetStationId = null;
+    }
+
+    cancelResetBtn.addEventListener('click', closeResetModal);
+
+    confirmResetBtn.addEventListener('click', async () => {
+        if (!currentResetStationId) return;
+
+        confirmResetBtn.disabled = true;
+        confirmResetBtn.textContent = 'Resetting...';
+
+        try {
+            const res = await fetchWithAuth(`/api/admin/stations/${currentResetStationId}/reset`, {
+                method: 'POST'
+            });
+
+            if (res && res.ok) {
+                // Refresh data
+                await loadStations();
+                await loadLogs();
+                closeResetModal();
+            } else {
+                alert('Failed to reset station.');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error during reset.');
+        } finally {
+            confirmResetBtn.disabled = false;
+            confirmResetBtn.textContent = 'Confirm Reset';
+        }
+    });
+
+    // Password Modal Logic
+    changePwdBtn.addEventListener('click', () => {
+        document.getElementById('current-pwd').value = '';
+        document.getElementById('new-pwd').value = '';
+        document.getElementById('pwd-error').classList.add('hidden');
+        document.getElementById('pwd-success').classList.add('hidden');
+        pwdModal.classList.add('active');
+    });
+
+    cancelPwdBtn.addEventListener('click', () => {
+        pwdModal.classList.remove('active');
+    });
+
+    pwdForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('current-pwd').value;
+        const newPassword = document.getElementById('new-pwd').value;
+        const errorDiv = document.getElementById('pwd-error');
+        const successDiv = document.getElementById('pwd-success');
+        const submitBtn = pwdForm.querySelector('button[type="submit"]');
+        
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        submitBtn.disabled = true;
+
+        try {
+            const res = await fetchWithAuth('/api/admin/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                successDiv.textContent = 'Password changed successfully.';
+                successDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    pwdModal.classList.remove('active');
+                }, 2000);
+            } else {
+                errorDiv.textContent = data.error || 'Failed to change password.';
+                errorDiv.classList.remove('hidden');
+            }
+        } catch (e) {
+            errorDiv.textContent = 'An error occurred.';
+            errorDiv.classList.remove('hidden');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Initial Load
+    loadStations();
+    loadLogs();
+});
