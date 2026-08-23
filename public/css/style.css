@@ -440,28 +440,30 @@ h1 {
     .station-page-days {
         font-size: 22vw;
     }
-}    font-weight: 500;
 }
 
 .back-btn {
-    position: absolute;
-    top: 2rem;
-    left: 4vw;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     text-decoration: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.95rem;
     letter-spacing: 0.5px;
-    transition: all 0.2s ease;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
+    transition: all 0.25s ease;
+    padding: 0.6rem 1.25rem;
+    border-radius: 30px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .back-btn:hover {
-    color: var(--text-primary);
-    background: var(--card-bg);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateX(-3px);
 }
 
 /* Admin Styles */
