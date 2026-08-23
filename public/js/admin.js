@@ -40,6 +40,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logsPageInfo = document.getElementById('logs-page-info');
     const logsPagination = document.getElementById('logs-pagination');
 
+    const exportLogsBtn = document.getElementById('export-logs-btn');
+
+    if (exportLogsBtn) {
+        exportLogsBtn.addEventListener('click', async () => {
+            try {
+                const res = await fetchWithAuth('/api/admin/logs/export');
+                if (!res || !res.ok) return;
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'reset_logs.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (err) {
+                console.error('Failed to export CSV', err);
+                alert('Failed to export logs CSV.');
+            }
+        });
+    }
+
     if (prevLogsBtn) {
         prevLogsBtn.addEventListener('click', () => {
             if (currentLogPage > 1) {

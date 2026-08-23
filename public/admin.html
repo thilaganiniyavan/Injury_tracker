@@ -46,7 +46,13 @@
             </div>
 
             <div class="glass-card" style="margin-top: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">Reset Logs</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0;">Reset Logs</h2>
+                    <button id="export-logs-btn" class="header-text-btn" style="display: flex; align-items: center; gap: 0.4rem; border: 1px solid var(--card-border);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export CSV
+                    </button>
+                </div>
                 <div id="logs-loading" class="loading hidden">Loading logs...</div>
                 
                 <table id="admin-logs-table" class="admin-table hidden">

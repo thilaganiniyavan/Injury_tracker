@@ -236,6 +236,31 @@ app.get('/api/admin/logs', authenticateAdmin, (req, res) => {
     });
 });
 
+// Export All Logs as CSV
+app.get('/api/admin/logs/export', authenticateAdmin, (req, res) => {
+    const query = `
+        SELECT resets.id, stations.station_code, resets.previous_last_injury_date, resets.new_last_injury_date, resets.reset_timestamp 
+        FROM resets 
+        JOIN stations ON resets.station_id = stations.id 
+        ORDER BY resets.reset_timestamp DESC
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+
+        let csv = 'ID,Timestamp (IST),Station,Previous Last Injury Date,New Last Injury Date\n';
+        rows.forEach(r => {
+            const dateObj = new Date(r.reset_timestamp + 'Z');
+            const formattedDate = dateObj.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata' }).replace(',', '');
+            csv += `"${r.id}","${formattedDate}","${r.station_code}","${r.previous_last_injury_date}","${r.new_last_injury_date}"\n`;
+        });
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="reset_logs.csv"');
+        res.status(200).send(csv);
+    });
+});
+
 // Catch-all to serve index.html for unknown routes (for SPA-like behavior if needed, but we will use separate HTML files)
 app.get('/station/:code', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'station.html'));
