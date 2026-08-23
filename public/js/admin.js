@@ -44,23 +44,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (exportLogsBtn) {
         exportLogsBtn.addEventListener('click', async () => {
+            exportLogsBtn.disabled = true;
+            const originalText = exportLogsBtn.innerHTML;
+            exportLogsBtn.innerHTML = 'Exporting...';
+
             try {
                 const res = await fetchWithAuth('/api/admin/logs/export');
-                if (!res || !res.ok) return;
+                if (!res || !res.ok) {
+                    alert('Failed to fetch export data.');
+                    exportLogsBtn.innerHTML = originalText;
+                    exportLogsBtn.disabled = false;
+                    return;
+                }
 
-                const blob = await res.blob();
+                const text = await res.text();
+                const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.style.display = 'none';
                 a.href = url;
-                a.download = 'reset_logs.csv';
+                a.setAttribute('download', 'reset_logs.csv');
                 document.body.appendChild(a);
                 a.click();
-                window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                exportLogsBtn.innerHTML = 'Exported!';
+                setTimeout(() => {
+                    exportLogsBtn.innerHTML = originalText;
+                    exportLogsBtn.disabled = false;
+                }, 1500);
             } catch (err) {
                 console.error('Failed to export CSV', err);
                 alert('Failed to export logs CSV.');
+                exportLogsBtn.innerHTML = originalText;
+                exportLogsBtn.disabled = false;
             }
         });
     }
