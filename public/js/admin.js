@@ -205,6 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         btn.textContent = 'Saved!';
                         setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 1500);
                         await loadStations();
+                        await loadLogs(1);
                     } else {
                         alert('Failed to update station dates.');
                         btn.disabled = false;
