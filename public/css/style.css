@@ -163,6 +163,7 @@ h1 {
     flex: 1;
     min-width: 300px;
     max-width: 550px;
+    aspect-ratio: 1158 / 1630;
     border-radius: 16px;
     overflow: hidden;
     background: transparent;
@@ -181,9 +182,9 @@ h1 {
 
 .poster-img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 16px;
 }
 
