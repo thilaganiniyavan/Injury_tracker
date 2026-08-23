@@ -214,6 +214,19 @@ h1 {
     border-color: var(--accent-color);
 }
 
+.subtitle-bar {
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.subtitle-bar .subtitle {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+
 /* Dashboard Grid */
 .stations-grid {
     display: flex;
@@ -223,7 +236,7 @@ h1 {
     gap: 1.25rem;
     width: 100%;
     max-width: 1650px;
-    margin: calc(2rem + 50px) auto 2rem auto;
+    margin: 2rem auto;
 }
 
 @media (min-width: 1300px) {
