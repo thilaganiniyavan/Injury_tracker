@@ -515,6 +515,15 @@ h1 {
     letter-spacing: 1px;
 }
 
+.logs-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+}
+
 .header-text-btn {
     background: transparent;
     border: none;

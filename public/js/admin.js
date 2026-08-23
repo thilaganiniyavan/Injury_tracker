@@ -32,8 +32,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Load logs
-    async function loadLogs() {
+    let currentLogPage = 1;
+    let totalLogPages = 1;
+
+    const prevLogsBtn = document.getElementById('prev-logs-btn');
+    const nextLogsBtn = document.getElementById('next-logs-btn');
+    const logsPageInfo = document.getElementById('logs-page-info');
+    const logsPagination = document.getElementById('logs-pagination');
+
+    if (prevLogsBtn) {
+        prevLogsBtn.addEventListener('click', () => {
+            if (currentLogPage > 1) {
+                currentLogPage--;
+                loadLogs(currentLogPage);
+            }
+        });
+    }
+
+    if (nextLogsBtn) {
+        nextLogsBtn.addEventListener('click', () => {
+            if (currentLogPage < totalLogPages) {
+                currentLogPage++;
+                loadLogs(currentLogPage);
+            }
+        });
+    }
+
+    // Load logs with pagination (10 per page)
+    async function loadLogs(page = 1) {
         const logsTable = document.getElementById('admin-logs-table');
         const logsBody = document.getElementById('logs-table-body');
         const logsLoading = document.getElementById('logs-loading');
@@ -42,12 +68,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         logsLoading.classList.remove('hidden');
         logsTable.classList.add('hidden');
         noLogsMsg.classList.add('hidden');
+        if (logsPagination) logsPagination.classList.add('hidden');
 
         try {
-            const res = await fetchWithAuth('/api/admin/logs');
+            const res = await fetchWithAuth(`/api/admin/logs?page=${page}&limit=10`);
             if (!res) return;
             
-            const logs = await res.json();
+            const data = await res.json();
+            const logs = data.logs || [];
+            currentLogPage = data.page || 1;
+            totalLogPages = data.totalPages || 1;
             
             if (logs.length === 0) {
                 noLogsMsg.classList.remove('hidden');
@@ -68,6 +98,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     logsBody.appendChild(tr);
                 });
                 logsTable.classList.remove('hidden');
+
+                if (logsPagination) {
+                    logsPagination.classList.remove('hidden');
+                    logsPageInfo.textContent = `Page ${currentLogPage} of ${totalLogPages}`;
+                    prevLogsBtn.disabled = currentLogPage <= 1;
+                    nextLogsBtn.disabled = currentLogPage >= totalLogPages;
+                    prevLogsBtn.style.opacity = currentLogPage <= 1 ? '0.4' : '1';
+                    nextLogsBtn.style.opacity = currentLogPage >= totalLogPages ? '0.4' : '1';
+                }
             }
         } catch (e) {
             console.error('Error loading logs', e);

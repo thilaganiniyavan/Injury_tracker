@@ -94,20 +94,52 @@ const getISTDate = () => {
 app.put('/api/admin/stations/:id', authenticateAdmin, (req, res) => {
     const stationId = req.params.id;
     const { campaign_start_date, last_injury_date } = req.body;
+    const todayIST = getISTDate();
 
     if (!campaign_start_date || !last_injury_date) {
         return res.status(400).json({ error: 'Both campaign start date and last injury date are required' });
     }
 
-    db.run(
-        `UPDATE stations SET campaign_start_date = ?, last_injury_date = ? WHERE id = ?`,
-        [campaign_start_date, last_injury_date, stationId],
-        function(err) {
-            if (err) return res.status(500).json({ error: 'Failed to update station dates' });
-            if (this.changes === 0) return res.status(404).json({ error: 'Station not found' });
-            res.json({ success: true, campaign_start_date, last_injury_date });
-        }
-    );
+    db.get(`SELECT last_injury_date FROM stations WHERE id = ?`, [stationId], (err, row) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!row) return res.status(404).json({ error: 'Station not found' });
+
+        const previousDate = row.last_injury_date;
+        const dateChanged = previousDate !== last_injury_date;
+
+        db.serialize(() => {
+            db.run(`BEGIN TRANSACTION`);
+
+            db.run(
+                `UPDATE stations SET campaign_start_date = ?, last_injury_date = ? WHERE id = ?`,
+                [campaign_start_date, last_injury_date, stationId],
+                function(err) {
+                    if (err) {
+                        db.run(`ROLLBACK`);
+                        return res.status(500).json({ error: 'Failed to update station dates' });
+                    }
+
+                    if (dateChanged) {
+                        db.run(
+                            `INSERT INTO resets (station_id, previous_last_injury_date, new_last_injury_date, reset_date) VALUES (?, ?, ?, ?)`,
+                            [stationId, previousDate, last_injury_date, todayIST],
+                            function(err) {
+                                if (err) {
+                                    db.run(`ROLLBACK`);
+                                    return res.status(500).json({ error: 'Failed to record log' });
+                                }
+                                db.run(`COMMIT`);
+                                res.json({ success: true, campaign_start_date, last_injury_date });
+                            }
+                        );
+                    } else {
+                        db.run(`COMMIT`);
+                        res.json({ success: true, campaign_start_date, last_injury_date });
+                    }
+                }
+            );
+        });
+    });
 });
 
 // Reset Station
@@ -171,18 +203,36 @@ app.post('/api/admin/change-password', authenticateAdmin, (req, res) => {
     });
 });
 
-// Get Logs
+// Get Paginated Logs
 app.get('/api/admin/logs', authenticateAdmin, (req, res) => {
-    const query = `
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = (page - 1) * limit;
+
+    const countQuery = `SELECT COUNT(*) AS total FROM resets`;
+    const dataQuery = `
         SELECT resets.id, stations.station_code, resets.previous_last_injury_date, resets.new_last_injury_date, resets.reset_timestamp 
         FROM resets 
         JOIN stations ON resets.station_id = stations.id 
         ORDER BY resets.reset_timestamp DESC 
-        LIMIT 50
+        LIMIT ? OFFSET ?
     `;
-    db.all(query, [], (err, rows) => {
+
+    db.get(countQuery, [], (err, countRow) => {
         if (err) return res.status(500).json({ error: 'Database error' });
-        res.json(rows);
+        const total = countRow ? countRow.total : 0;
+        const totalPages = Math.ceil(total / limit) || 1;
+
+        db.all(dataQuery, [limit, offset], (err, rows) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.json({
+                logs: rows,
+                total,
+                page,
+                totalPages,
+                limit
+            });
+        });
     });
 });
 
