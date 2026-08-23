@@ -515,6 +515,34 @@ h1 {
     letter-spacing: 1px;
 }
 
+.header-text-btn {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.header-text-btn:hover {
+    color: var(--text-primary);
+    background: var(--card-bg);
+}
+
+.header-text-btn.danger-text {
+    color: var(--danger-color);
+}
+
+.header-text-btn.danger-text:hover {
+    color: var(--danger-hover, #ff4d4d);
+    background: rgba(239, 68, 68, 0.1);
+}
+
 .btn {
     padding: 0.6rem 1.25rem;
     border-radius: 8px;
