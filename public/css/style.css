@@ -115,6 +115,14 @@ h1 {
     border-radius: 6px;
 }
 
+.starrise-img {
+    height: 80px;
+    max-height: 95px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+
 .theme-btn {
     background: transparent;
     border: 1px solid var(--card-border);
