@@ -90,6 +90,26 @@ const getISTDate = () => {
     return `${year}-${month}-${day}`;
 };
 
+// Update Station Dates (campaign_start_date & last_injury_date)
+app.put('/api/admin/stations/:id', authenticateAdmin, (req, res) => {
+    const stationId = req.params.id;
+    const { campaign_start_date, last_injury_date } = req.body;
+
+    if (!campaign_start_date || !last_injury_date) {
+        return res.status(400).json({ error: 'Both campaign start date and last injury date are required' });
+    }
+
+    db.run(
+        `UPDATE stations SET campaign_start_date = ?, last_injury_date = ? WHERE id = ?`,
+        [campaign_start_date, last_injury_date, stationId],
+        function(err) {
+            if (err) return res.status(500).json({ error: 'Failed to update station dates' });
+            if (this.changes === 0) return res.status(404).json({ error: 'Station not found' });
+            res.json({ success: true, campaign_start_date, last_injury_date });
+        }
+    );
+});
+
 // Reset Station
 app.post('/api/admin/stations/:id/reset', authenticateAdmin, (req, res) => {
     const stationId = req.params.id;

@@ -112,16 +112,72 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight: 600;">${station.station_code}</td>
-                <td>${formatDate(station.campaign_start_date)}</td>
-                <td>${formatDate(station.last_injury_date)}</td>
-                <td><span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-color);">${days}</span></td>
                 <td>
-                    <button class="btn btn-danger reset-btn" data-id="${station.id}" data-code="${station.station_code}">
-                        Reset to Today
-                    </button>
+                    <input type="date" class="form-control date-input campaign-date" data-id="${station.id}" value="${station.campaign_start_date}">
+                </td>
+                <td>
+                    <input type="date" class="form-control date-input last-injury-date" data-id="${station.id}" value="${station.last_injury_date}">
+                </td>
+                <td><span class="days-count" id="days-${station.id}" style="font-size: 1.25rem; font-weight: 700; color: var(--accent-color);">${days}</span></td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary save-btn" data-id="${station.id}">Save</button>
+                        <button class="btn btn-danger reset-btn" data-id="${station.id}" data-code="${station.station_code}">Reset to Today</button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
+        });
+
+        // Add event listeners to date inputs for instant UI recalculation on change
+        document.querySelectorAll('.last-injury-date').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const id = e.target.getAttribute('data-id');
+                const daysSpan = document.getElementById(`days-${id}`);
+                if (daysSpan) {
+                    daysSpan.textContent = calculateInjuryFreeDays(e.target.value);
+                }
+            });
+        });
+
+        // Add event listeners to save buttons
+        document.querySelectorAll('.save-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = e.target.getAttribute('data-id');
+                const row = e.target.closest('tr');
+                const campaignDateInput = row.querySelector('.campaign-date');
+                const lastInjuryDateInput = row.querySelector('.last-injury-date');
+
+                btn.disabled = true;
+                const origText = btn.textContent;
+                btn.textContent = 'Saving...';
+
+                try {
+                    const res = await fetchWithAuth(`/api/admin/stations/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            campaign_start_date: campaignDateInput.value,
+                            last_injury_date: lastInjuryDateInput.value
+                        })
+                    });
+
+                    if (res && res.ok) {
+                        btn.textContent = 'Saved!';
+                        setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 1500);
+                        await loadStations();
+                    } else {
+                        alert('Failed to update station dates.');
+                        btn.disabled = false;
+                        btn.textContent = origText;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error saving station dates.');
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                }
+            });
         });
 
         // Add event listeners to reset buttons

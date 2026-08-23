@@ -26,8 +26,8 @@ function calculateInjuryFreeDays(lastInjuryDateStr) {
     // Difference in milliseconds
     const diffTime = today - lastInjury;
     
-    // Difference in days (add 1 to include the start date)
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    // Difference in days
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     return diffDays >= 0 ? diffDays : 0;
 }

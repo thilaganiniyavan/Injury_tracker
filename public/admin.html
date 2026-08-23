@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="admin-page">
     <div class="container">
         <header>
             <div>
@@ -15,9 +15,10 @@
                 <p class="subtitle">Manage station injury records</p>
             </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
-                <button id="theme-toggle" class="btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding: 0;">🌙</button>
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">DARK</button>
                 <button id="change-pwd-btn" class="btn btn-primary">Change Password</button>
                 <button id="logout-btn" class="btn btn-danger">Logout</button>
+                <img src="/images/logo.png" alt="Company Logo" class="logo-img">
             </div>
         </header>
 
@@ -32,7 +33,7 @@
                             <th>Campaign Start Date</th>
                             <th>Last Injury Date</th>
                             <th>Injury-Free Days</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="admin-table-body">

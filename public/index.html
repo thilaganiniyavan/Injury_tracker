@@ -16,10 +16,12 @@
                 <p class="subtitle">Live Tracking of Injury-Free Days across all stations</p>
             </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
-                <button id="theme-toggle" class="btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding: 0;">
-                    🌙
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">
+                    DARK
                 </button>
-                <div class="logo-placeholder">COMPANY LOGO</div>
+                <div class="logo-placeholder">
+                    <img src="/images/logo.png" alt="Company Logo" class="logo-img">
+                </div>
             </div>
         </header>
 
@@ -28,6 +30,18 @@
             <div id="stations-grid" class="stations-grid hidden">
                 <!-- Station cards will be injected here via JS -->
             </div>
+
+            <section class="posters-section">
+                <h2 class="posters-title">Safety Campaign Showcase</h2>
+                <div class="posters-grid">
+                    <div class="poster-card">
+                        <img src="/images/launchposter.jpeg" alt="Safety Campaign Launch Poster 1" class="poster-img">
+                    </div>
+                    <div class="poster-card">
+                        <img src="/images/launchposter2.jpeg" alt="Safety Campaign Launch Poster 2" class="poster-img">
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
