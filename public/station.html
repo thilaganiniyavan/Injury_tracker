@@ -23,28 +23,13 @@
 
         <main id="station-content" class="station-page-container">
             <div id="loading" class="loading">Loading station data...</div>
-            <div id="station-details" class="hidden station-details-flex">
-                <div class="station-page-code-wrap">
-                    <div id="station-name" class="station-page-code">--</div>
-                </div>
-                
-                <div class="station-counter-showcase">
-                    <div class="station-side-poster left-poster">
-                        <img src="/images/launchposter.jpeg" alt="Safety Poster 1" class="poster-side-img">
-                    </div>
-                    
-                    <div class="station-number-center">
-                        <div id="injury-days" class="station-page-days">--</div>
-                        <div class="station-page-label">Injury-Free Days</div>
-                        <div class="station-dates-row">
-                            <div class="station-page-date">Campaign Started: <span id="campaign-start-date" style="color: var(--text-primary); font-weight: 700;">--</span></div>
-                            <div class="station-page-date">Last Injury Date: <span id="last-injury-date" style="color: var(--text-primary); font-weight: 700;">--</span></div>
-                        </div>
-                    </div>
-
-                    <div class="station-side-poster right-poster">
-                        <img src="/images/launchposter2.jpeg" alt="Safety Poster 2" class="poster-side-img">
-                    </div>
+            <div id="station-details" class="hidden">
+                <div id="station-name" class="station-page-code">--</div>
+                <div id="injury-days" class="station-page-days">--</div>
+                <div class="station-page-label">Injury-Free Days</div>
+                <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+                    <div class="station-page-date">Campaign Started: <span id="campaign-start-date" style="color: var(--text-primary); font-weight: 700;">--</span></div>
+                    <div class="station-page-date">Last Injury Date: <span id="last-injury-date" style="color: var(--text-primary); font-weight: 700;">--</span></div>
                 </div>
             </div>
             <div id="error-message" class="hidden error-message" style="font-size: 1.5rem;"></div>
