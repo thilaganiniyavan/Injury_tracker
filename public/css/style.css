@@ -363,11 +363,11 @@ h1 {
 }
 
 .station-side-poster {
-    flex: 0 0 320px;
-    max-width: 380px;
-    border-radius: 16px;
+    flex: 0 0 480px;
+    max-width: 550px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease;
 }
 
